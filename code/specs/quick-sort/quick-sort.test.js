@@ -12,13 +12,37 @@
 
 */
 
-function quickSort(nums) {
-  // code goes here
+const quickSort = (nums) => {
+
+  if(nums.length <= 1) {
+    return nums;
+  }
+
+  const pivot = nums[nums.length - 1];
+
+  // filter would increase complexity
+  // const largerList = nums.filter((num) => num > pivot);
+  // const smallerList = nums.filter((num) => num < pivot);
+
+  const smallerList = [];
+  const largerList = [];
+
+  // sort all smaller numbers than the pivot into left
+  // and all bigger numbers into right
+  for (let i = 0; i < nums.length - 1; i++) {
+    if (nums[i] < pivot) {
+      smallerList.push(nums[i]);
+    } else {
+      largerList.push(nums[i]);
+    }
+  }
+
+  return [...quickSort(smallerList), pivot, ...quickSort(largerList)];
 }
 
 // unit tests
 // do not modify the below code
-test.skip("quickSort", function () {
+test("quickSort", () => {
   const input = [10, 8, 2, 1, 6, 3, 9, 4, 7, 5];
   const answer = quickSort(input);
 
