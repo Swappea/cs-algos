@@ -13,19 +13,72 @@ const { CITY_NAMES } = require("./cities.js");
 const _ = require("lodash"); // needed for unit tests
 
 class Node {
-  // you don't have to use this data structure, this is just how I did it
-  // you'll almost definitely need more methods than this and a constructor
-  // and instance variables
+  constructor(string) {
+    this.children = [];
+    this.terminus = false; // complete flag
+    this.value = string[0];
+
+    if (string.length > 1) {
+      this.children.push(new Node(string.substr(1)));
+    } else {
+      this.terminus = true;
+    }
+  }
+
+  add(string) {
+    const value = string[0];
+    const next = string.substr(1);
+
+    for (let i = 0; i < this.children.length; i++) {
+      const child = this.children[i];
+      if (child.value === value) {
+        if (next) {
+          child.add(next);
+        } else {
+          child.terminus = true;
+        }
+        return;
+      }
+    }
+    
+    this.children.push(new Node(string));
+  }
+
+  _complete(search, built, suggestions) {
+    if (suggestions.length >= 3 || (search && search[0] !== this.value)) {
+      return suggestions;
+    }
+
+    if (this.terminus) {
+      suggestions.push(`${built}${this.value}`);
+    }
+
+    this.children.forEach((child) =>
+      child._complete(search.substr(1), `${built}${this.value}`, suggestions)
+    );
+
+    return suggestions;
+  }
+
   complete(string) {
-    return [];
+    let completions = [];
+
+    for (let i = 0; i < this.children.length; i++) {
+      const child = this.children[i];
+      completions = completions.concat(child._complete(string, "", []));
+    }
+
+    return completions;
   }
 }
 
 const createTrie = (words) => {
-  // you do not have to do it this way; this is just how I did it
   const root = new Node("");
 
-  // more code should go here
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i];
+    root.add(word.toLowerCase());
+  }
 
   return root;
 };
